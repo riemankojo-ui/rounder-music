@@ -73,6 +73,11 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 #mini{left:0;right:0;bottom:0;height:68px;border-radius:18px 18px 0 0;background:linear-gradient(rgba(255,255,255,.1),rgba(255,255,255,.1)),var(--bot);box-shadow:0 -4px 16px rgba(0,0,0,.4);padding:0 4px 0 12px;gap:6px}
 #mini .meta{overflow:hidden;padding-right:4px}
 #mini .ib{width:38px;height:38px}
+#full{padding:13vh 22px 20px}
+@media (max-height:700px){#full{padding-top:70px}}
+#bigart{border-radius:10px}
+.row{border-radius:2px}
+.art{border-radius:2px}
 </style>
 </head>
 <body>
@@ -175,7 +180,7 @@ let hue=+localStorage.hue||260,anim=null;
 function hex(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1));return '#'+[f(0),f(8),f(4)].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('')}
 function paint(h){
   hue=h;
-  const top='#141416',bot='#141416',ac='#c4b5fd',r=document.documentElement.style;
+  const top='#17232f',bot='#0f151c',ac='#c4b5fd',r=document.documentElement.style;
   r.setProperty('--top',top);r.setProperty('--bot',bot);r.setProperty('--ac',ac);
   try{Music.setBars({top:top,bottom:bot}).catch(()=>{})}catch(e){}
 }
@@ -430,6 +435,9 @@ function openQ(){
 }
 const closeQ=()=>$('qs').classList.remove('open');
 $('qBtn').onclick=openQ;
+document.addEventListener('click',e=>{
+  if($('qs').classList.contains('open')&&!e.target.closest('#qs')&&!e.target.closest('#qBtn'))closeQ();
+});
 $('ql').onclick=async e=>{
   const r=e.target.closest('[data-q]');
   if(r)apply(await Music.playId({id:+r.dataset.q}));
@@ -444,7 +452,8 @@ AppP.addListener('backButton',()=>{
 
 /* ---------- start ---------- */
 async function load(){
-  $('list').innerHTML='<div class="empty">Loading your music…</div>';
+  if(!songs.length){try{const c=JSON.parse(localStorage.songsCache||'[]');if(c.length){songs=c;byId={};songs.forEach(s=>byId[s.id]=s);render()}}catch(e){}}
+  if(!songs.length)$('list').innerHTML='<div class="empty">Loading your music…</div>';
   try{
     const r=await Music.getSongs();
     songs=r.songs;byId={};
@@ -454,6 +463,7 @@ async function load(){
       byId[s.id]=s;
     });
     render();
+    try{localStorage.songsCache=JSON.stringify(songs)}catch(e){}
     const l=+localStorage.last;
     if(l&&byId[l]&&!shown)showTrack(l,false);
     apply(await Music.getState());

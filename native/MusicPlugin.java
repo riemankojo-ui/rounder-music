@@ -166,6 +166,16 @@ public class MusicPlugin extends Plugin {
         new Thread(() -> {
             JSObject o = new JSObject();
             try {
+                java.io.File cf = new java.io.File(getContext().getCacheDir(), "art_" + id + "_" + size + ".jpg");
+                if (cf.exists() && cf.length() > 0) {
+                    byte[] cb = new byte[(int) cf.length()];
+                    java.io.DataInputStream di = new java.io.DataInputStream(new java.io.FileInputStream(cf));
+                    di.readFully(cb);
+                    di.close();
+                    o.put("img", "data:image/jpeg;base64," + Base64.encodeToString(cb, Base64.NO_WRAP));
+                    call.resolve(o);
+                    return;
+                }
                 Song s = byId.get(id);
                 if (s != null) {
                     Bitmap b = null;
@@ -188,6 +198,7 @@ public class MusicPlugin extends Plugin {
                     if (b != null) {
                         ByteArrayOutputStream bo = new ByteArrayOutputStream();
                         b.compress(Bitmap.CompressFormat.JPEG, 82, bo);
+                        try { java.io.FileOutputStream fo = new java.io.FileOutputStream(cf); fo.write(bo.toByteArray()); fo.close(); } catch (Exception e) { }
                         o.put("img", "data:image/jpeg;base64," + Base64.encodeToString(bo.toByteArray(), Base64.NO_WRAP));
                     }
                 }
@@ -256,7 +267,112 @@ public class MusicPlugin extends Plugin {
         }
     }
 
-    private void startSvc(Song s) {
+    private void startSvc(final Song s) {
+        PlayerService.title = s.title == null ? "Rounder Music" : s.title;
+        PlayerService.artist = s.artist == null ? "" : s.artist;
+        PlayerService.playing = true;
+        if (PlayerService.artId != s.id) {
+            PlayerService.art = null;
+            PlayerService.artId = s.id;
+        }
+        pushState();
+        if (PlayerService.art == null) {
+            new Thread(() -> {
+                Bitmap b = notifArt(s);
+                if (b != null && curId == s.id) {
+                    PlayerService.art = b;
+                    h.post(this::pushState);
+                }
+            }).start();
+        }
+    }
+
+    private void pushState() {
+        try {
+            PlayerService.pos = (mp != null && prepared) ? mp.getCurrentPosition() : 0;
+            PlayerService.dur = (mp != null && prepared) ? mp.getDuration() : 0;
+            PlayerService.speed = speed;
+            if (PlayerService.me != null) {
+                PlayerService.me.refresh();
+            } else if (PlayerService.playing) {
+                Intent i = new Intent(getContext(), PlayerService.class);
+                if (Build.VERSION.SDK_INT >= 26) getContext().startForegroundService(i);
+                else getContext().startService(i);
+            }
+        } catch (Exception e) { }
+    }
+
+    private Bitmap notifArt(Song s) {
+        try {
+            java.io.File cf = new java.io.File(getContext().getCacheDir(), "art_" + s.id + "_600.jpg");
+            if (cf.exists() && cf.length() > 0) return BitmapFactory.decodeFile(cf.getAbsolutePath());
+            Bitmap b = null;
+            Uri u = Uri.parse(s.uri);
+            if (Build.VERSION.SDK_INT >= 29) {
+                try { b = getContext().getContentResolver().loadThumbnail(u, new Size(300, 300), null); }
+                catch (Exception e) { }
+            }
+            if (b == null) {
+                MediaMetadataRetriever r = new MediaMetadataRetriever();
+                try {
+                    r.setDataSource(getContext(), u);
+                    byte[] d = r.getEmbeddedPicture();
+                    if (d != null) b = decode(d, 300);
+                } catch (Exception e) {
+                } finally {
+                    try { r.release(); } catch (Exception e) { }
+                }
+            }
+            return b;
+        } catch (Exception e) { return null; }
+    }
+
+    static void cmd(final String c, final int arg) {
+        final MusicPlugin p = inst;
+        if (p == null) return;
+        p.h.post(() -> p.doCmd(c, arg));
+    }
+
+    private void doCmd(String c, int arg) {
+        try {
+            if (c.equals("toggle")) doToggle();
+            else if (c.equals("play")) { if (mp != null && prepared && !mp.isPlaying()) doToggle(); }
+            else if (c.equals("pause")) { if (mp != null && prepared && mp.isPlaying()) doToggle(); }
+            else if (c.equals("next")) doNext();
+            else if (c.equals("prev")) doPrev();
+            else if (c.equals("seek")) { if (mp != null && prepared) { mp.seekTo(arg); pushState(); } }
+        } catch (Exception e) { }
+    }
+
+    private void doToggle() {
+        if (mp == null || !prepared) return;
+        if (mp.isPlaying()) {
+            mp.pause();
+            stopSvc();
+        } else {
+            focus();
+            int d = mp.getDuration();
+            if (d > 0 && mp.getCurrentPosition() >= d - 300) mp.seekTo(0);
+            mp.start();
+            applySpeed();
+            Song s = byId.get(curId);
+            if (s != null) startSvc(s);
+        }
+    }
+
+    private void doNext() {
+        if (queue.isEmpty()) return;
+        if (shuffle && queue.size() > 1) playIndex(randomOther(), 0);
+        else playIndex((index + 1) % queue.size(), 0);
+    }
+
+    private void doPrev() {
+        if (queue.isEmpty()) return;
+        if (prepared && mp.getCurrentPosition() > 3000) { mp.seekTo(0); pushState(); return; }
+        playIndex((index - 1 + queue.size()) % queue.size(), 0);
+    }
+
+    private void startSvcOld(Song s) {
         try {
             Intent i = new Intent(getContext(), PlayerService.class);
             i.putExtra("title", s.title);
@@ -267,6 +383,11 @@ public class MusicPlugin extends Plugin {
     }
 
     private void stopSvc() {
+        PlayerService.playing = false;
+        pushState();
+    }
+
+    private void stopSvcOld() {
         try { getContext().stopService(new Intent(getContext(), PlayerService.class)); } catch (Exception e) { }
     }
 
@@ -386,7 +507,7 @@ public class MusicPlugin extends Plugin {
     @PluginMethod
     public void seek(PluginCall call) {
         final int ms = call.getData().optInt("ms", 0);
-        post(call, () -> { if (mp != null && prepared) mp.seekTo(ms); });
+        post(call, () -> { if (mp != null && prepared) { mp.seekTo(ms); pushState(); } });
     }
 
     @PluginMethod
