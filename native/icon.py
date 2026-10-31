@@ -27,8 +27,8 @@ FG = '''<?xml version="1.0" encoding="utf-8"?>
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
     <path
-        android:pathData="M70,37 C62,28 38,30 38,43 C38,54 70,52 70,65 C70,78 46,80 38,71"
-        android:strokeWidth="9"
+        android:pathData="M65.2,42.1 C59.6,35.8 42.8,37.2 42.8,46.3 C42.8,54 65.2,52.6 65.2,61.7 C65.2,70.8 48.4,72.2 42.8,65.9"
+        android:strokeWidth="6.5"
         android:strokeLineCap="round"
         android:strokeLineJoin="round">
         <aapt:attr name="android:strokeColor">
