@@ -1,0 +1,446 @@
+package com.rieman.softplayer;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.media.PlaybackParams;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.PowerManager;
+import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Size;
+import android.view.Window;
+import android.view.WindowManager;
+
+import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+
+@CapacitorPlugin(name = "Music", permissions = {
+        @Permission(strings = {"android.permission.READ_MEDIA_AUDIO"}, alias = "audio13"),
+        @Permission(strings = {"android.permission.READ_EXTERNAL_STORAGE"}, alias = "audioOld"),
+        @Permission(strings = {"android.permission.POST_NOTIFICATIONS"}, alias = "notif")
+})
+public class MusicPlugin extends Plugin {
+
+    static class Song {
+        long id;
+        String title, artist, album, uri;
+    }
+
+    static MusicPlugin inst;
+
+    private final Handler h = new Handler(Looper.getMainLooper());
+    private final Map<Long, Song> byId = new ConcurrentHashMap<>();
+    private final List<Long> queue = new ArrayList<>();
+    private final Random rnd = new Random();
+    private MediaPlayer mp;
+    private boolean prepared = false;
+    private int index = -1;
+    private long curId = -1;
+    private boolean shuffle = false;
+    private int repeat = 0;
+    private float speed = 1f;
+    private long sleepAt = 0;
+
+    private final Runnable sleepTask = () -> {
+        try { if (mp != null && prepared && mp.isPlaying()) mp.pause(); } catch (Exception e) { }
+        sleepAt = 0;
+        stopSvc();
+    };
+
+    private final AudioManager.OnAudioFocusChangeListener fl = ch -> {
+        if ((ch == AudioManager.AUDIOFOCUS_LOSS || ch == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) && mp != null && prepared) {
+            try { if (mp.isPlaying()) { mp.pause(); stopSvc(); } } catch (Exception e) { }
+        }
+    };
+
+    static void stopAll() {
+        final MusicPlugin p = inst;
+        if (p != null) p.h.post(p::killNow);
+    }
+
+    private void killNow() {
+        try { if (mp != null) { mp.release(); mp = null; } } catch (Exception e) { }
+        prepared = false;
+        curId = -1;
+    }
+
+    // ---------- permissions + library ----------
+    private String audioAlias() { return Build.VERSION.SDK_INT >= 33 ? "audio13" : "audioOld"; }
+
+    @PluginMethod
+    public void getSongs(PluginCall call) {
+        inst = this;
+        String a = audioAlias();
+        if (getPermissionState(a) != PermissionState.GRANTED) {
+            if (Build.VERSION.SDK_INT >= 33) requestPermissionForAliases(new String[]{a, "notif"}, call, "permDone");
+            else requestPermissionForAlias(a, call, "permDone");
+            return;
+        }
+        load(call);
+    }
+
+    @PermissionCallback
+    private void permDone(PluginCall call) {
+        if (getPermissionState(audioAlias()) == PermissionState.GRANTED) load(call);
+        else call.reject("denied");
+    }
+
+    private void load(final PluginCall call) {
+        new Thread(() -> {
+            try {
+                Uri src = Build.VERSION.SDK_INT >= 29
+                        ? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+                        : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                String[] cols = {
+                        MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE,
+                        MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
+                        MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.DATE_ADDED};
+                String sel = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " + MediaStore.Audio.Media.DURATION + " >= 15000";
+                JSArray arr = new JSArray();
+                byId.clear();
+                Cursor c = getContext().getContentResolver().query(src, cols, sel, null,
+                        MediaStore.Audio.Media.TITLE + " COLLATE NOCASE ASC");
+                if (c != null) {
+                    try {
+                        while (c.moveToNext()) {
+                            Song s = new Song();
+                            s.id = c.getLong(0);
+                            s.title = c.getString(1);
+                            s.artist = c.getString(2);
+                            s.album = c.getString(3);
+                            s.uri = android.content.ContentUris.withAppendedId(src, s.id).toString();
+                            byId.put(s.id, s);
+                            JSObject o = new JSObject();
+                            o.put("id", s.id);
+                            o.put("title", s.title == null ? "Unknown" : s.title);
+                            o.put("artist", s.artist == null ? "" : s.artist);
+                            o.put("album", s.album == null ? "" : s.album);
+                            o.put("dur", c.getLong(4));
+                            o.put("added", c.getLong(5));
+                            arr.put(o);
+                        }
+                    } finally {
+                        c.close();
+                    }
+                }
+                JSObject r = new JSObject();
+                r.put("songs", arr);
+                call.resolve(r);
+            } catch (Exception e) {
+                call.reject(e.getMessage() == null ? "error" : e.getMessage());
+            }
+        }).start();
+    }
+
+    // ---------- album art ----------
+    @PluginMethod
+    public void getArt(final PluginCall call) {
+        final long id = call.getData().optLong("id", -1);
+        final int size = call.getData().optInt("size", 160);
+        new Thread(() -> {
+            JSObject o = new JSObject();
+            try {
+                Song s = byId.get(id);
+                if (s != null) {
+                    Bitmap b = null;
+                    Uri u = Uri.parse(s.uri);
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        try { b = getContext().getContentResolver().loadThumbnail(u, new Size(size, size), null); }
+                        catch (Exception e) { }
+                    }
+                    if (b == null) {
+                        MediaMetadataRetriever r = new MediaMetadataRetriever();
+                        try {
+                            r.setDataSource(getContext(), u);
+                            byte[] d = r.getEmbeddedPicture();
+                            if (d != null) b = decode(d, size);
+                        } catch (Exception e) {
+                        } finally {
+                            try { r.release(); } catch (Exception e) { }
+                        }
+                    }
+                    if (b != null) {
+                        ByteArrayOutputStream bo = new ByteArrayOutputStream();
+                        b.compress(Bitmap.CompressFormat.JPEG, 82, bo);
+                        o.put("img", "data:image/jpeg;base64," + Base64.encodeToString(bo.toByteArray(), Base64.NO_WRAP));
+                    }
+                }
+            } catch (Exception e) { }
+            call.resolve(o);
+        }).start();
+    }
+
+    private Bitmap decode(byte[] d, int target) {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(d, 0, d.length, o);
+        int sample = 1;
+        while (o.outWidth / (sample * 2) >= target) sample *= 2;
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize = sample;
+        return BitmapFactory.decodeByteArray(d, 0, d.length, o2);
+    }
+
+    // ---------- playback ----------
+    private void post(final PluginCall call, final Runnable r) {
+        h.post(() -> {
+            try { r.run(); } catch (Exception e) { }
+            call.resolve(state());
+        });
+    }
+
+    private JSObject state() {
+        JSObject o = new JSObject();
+        boolean pl = false;
+        int pos = 0, dur = 0;
+        try {
+            if (mp != null && prepared) {
+                pl = mp.isPlaying();
+                pos = mp.getCurrentPosition();
+                dur = mp.getDuration();
+            }
+        } catch (Exception e) { }
+        o.put("id", curId);
+        o.put("playing", pl);
+        o.put("pos", pos);
+        o.put("dur", dur);
+        o.put("shuffle", shuffle);
+        o.put("repeat", repeat);
+        o.put("speed", (double) speed);
+        o.put("sleep", sleepAt > 0 ? Math.max(0, sleepAt - System.currentTimeMillis()) : 0);
+        return o;
+    }
+
+    private void focus() {
+        try {
+            AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+            am.requestAudioFocus(fl, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        } catch (Exception e) { }
+    }
+
+    private void applySpeed() {
+        if (Build.VERSION.SDK_INT >= 23 && mp != null && prepared) {
+            try {
+                boolean was = mp.isPlaying();
+                PlaybackParams p = mp.getPlaybackParams();
+                p.setSpeed(speed);
+                mp.setPlaybackParams(p);
+                if (!was && mp.isPlaying()) mp.pause();
+            } catch (Exception e) { }
+        }
+    }
+
+    private void startSvc(Song s) {
+        try {
+            Intent i = new Intent(getContext(), PlayerService.class);
+            i.putExtra("title", s.title);
+            i.putExtra("artist", s.artist == null ? "" : s.artist);
+            if (Build.VERSION.SDK_INT >= 26) getContext().startForegroundService(i);
+            else getContext().startService(i);
+        } catch (Exception e) { }
+    }
+
+    private void stopSvc() {
+        try { getContext().stopService(new Intent(getContext(), PlayerService.class)); } catch (Exception e) { }
+    }
+
+    private void playIndex(int i, int tries) {
+        if (i < 0 || i >= queue.size()) return;
+        Song s = byId.get(queue.get(i));
+        if (s == null) return;
+        try {
+            if (mp == null) {
+                mp = new MediaPlayer();
+                mp.setOnCompletionListener(m -> onDone());
+                mp.setOnErrorListener((m, w, e) -> { prepared = false; return true; });
+            }
+            mp.reset();
+            prepared = false;
+            mp.setAudioAttributes(new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build());
+            mp.setWakeMode(getContext(), PowerManager.PARTIAL_WAKE_LOCK);
+            mp.setDataSource(getContext(), Uri.parse(s.uri));
+            mp.prepare();
+            prepared = true;
+            index = i;
+            curId = s.id;
+            focus();
+            mp.start();
+            applySpeed();
+            startSvc(s);
+        } catch (Exception e) {
+            prepared = false;
+            if (tries < 5 && queue.size() > 1) playIndex((i + 1) % queue.size(), tries + 1);
+        }
+    }
+
+    private int randomOther() {
+        if (queue.size() < 2) return 0;
+        int n;
+        do { n = rnd.nextInt(queue.size()); } while (n == index);
+        return n;
+    }
+
+    private void onDone() {
+        if (repeat == 2) { playIndex(index, 0); return; }
+        if (shuffle && queue.size() > 1) { playIndex(randomOther(), 0); return; }
+        if (index + 1 < queue.size()) playIndex(index + 1, 0);
+        else if (repeat == 1 && !queue.isEmpty()) playIndex(0, 0);
+        else stopSvc();
+    }
+
+    @PluginMethod
+    public void setQueue(PluginCall call) {
+        final JSArray ids = call.getArray("ids");
+        final long start = call.getData().optLong("start", -1);
+        post(call, () -> {
+            queue.clear();
+            try {
+                for (int i = 0; i < ids.length(); i++) {
+                    long id = ids.getLong(i);
+                    if (byId.containsKey(id)) queue.add(id);
+                }
+            } catch (Exception e) { }
+            int i = queue.indexOf(start);
+            if (i < 0) i = 0;
+            playIndex(i, 0);
+        });
+    }
+
+    @PluginMethod
+    public void playId(PluginCall call) {
+        final long id = call.getData().optLong("id", -1);
+        post(call, () -> {
+            int i = queue.indexOf(id);
+            if (i >= 0) playIndex(i, 0);
+        });
+    }
+
+    @PluginMethod
+    public void getState(PluginCall call) { post(call, () -> { }); }
+
+    @PluginMethod
+    public void toggle(PluginCall call) {
+        post(call, () -> {
+            if (mp == null || !prepared) return;
+            if (mp.isPlaying()) {
+                mp.pause();
+                stopSvc();
+            } else {
+                focus();
+                int d = mp.getDuration();
+                if (d > 0 && mp.getCurrentPosition() >= d - 300) mp.seekTo(0);
+                mp.start();
+                applySpeed();
+                Song s = byId.get(curId);
+                if (s != null) startSvc(s);
+            }
+        });
+    }
+
+    @PluginMethod
+    public void next(PluginCall call) {
+        post(call, () -> {
+            if (queue.isEmpty()) return;
+            if (shuffle && queue.size() > 1) playIndex(randomOther(), 0);
+            else playIndex((index + 1) % queue.size(), 0);
+        });
+    }
+
+    @PluginMethod
+    public void prev(PluginCall call) {
+        post(call, () -> {
+            if (queue.isEmpty()) return;
+            if (prepared && mp.getCurrentPosition() > 3000) { mp.seekTo(0); return; }
+            playIndex((index - 1 + queue.size()) % queue.size(), 0);
+        });
+    }
+
+    @PluginMethod
+    public void seek(PluginCall call) {
+        final int ms = call.getData().optInt("ms", 0);
+        post(call, () -> { if (mp != null && prepared) mp.seekTo(ms); });
+    }
+
+    @PluginMethod
+    public void setShuffle(PluginCall call) {
+        final boolean on = call.getData().optBoolean("on", false);
+        post(call, () -> shuffle = on);
+    }
+
+    @PluginMethod
+    public void setRepeat(PluginCall call) {
+        final int m = call.getData().optInt("mode", 0);
+        post(call, () -> repeat = m);
+    }
+
+    @PluginMethod
+    public void setSpeed(PluginCall call) {
+        final float sp = (float) call.getData().optDouble("speed", 1.0);
+        post(call, () -> { speed = sp; applySpeed(); });
+    }
+
+    @PluginMethod
+    public void setSleep(PluginCall call) {
+        final int m = call.getData().optInt("minutes", 0);
+        post(call, () -> {
+            h.removeCallbacks(sleepTask);
+            if (m > 0) {
+                sleepAt = System.currentTimeMillis() + m * 60000L;
+                h.postDelayed(sleepTask, m * 60000L);
+            } else {
+                sleepAt = 0;
+            }
+        });
+    }
+
+    // ---------- status bar + navigation bar colors ----------
+    @PluginMethod
+    public void setBars(final PluginCall call) {
+        final String top = call.getString("top");
+        final String bot = call.getString("bottom");
+        final Activity a = getActivity();
+        if (a == null || top == null || bot == null) { call.resolve(); return; }
+        a.runOnUiThread(() -> {
+            try {
+                int t = Color.parseColor(top);
+                int b = Color.parseColor(bot);
+                Window w = a.getWindow();
+                w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                w.setStatusBarColor(t);
+                w.setNavigationBarColor(b);
+                if (Build.VERSION.SDK_INT >= 28) w.setNavigationBarDividerColor(Color.TRANSPARENT);
+                if (Build.VERSION.SDK_INT >= 29) w.setNavigationBarContrastEnforced(false);
+                getContext().getSharedPreferences("sp", 0).edit().putInt("top", t).putInt("bot", b).apply();
+            } catch (Exception e) { }
+        });
+        call.resolve();
+    }
+}
