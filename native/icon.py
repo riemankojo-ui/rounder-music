@@ -67,5 +67,25 @@ ST = '''<?xml version="1.0" encoding="utf-8"?>
 </vector>
 '''
 open(res + '/drawable/ic_stat_s.xml', 'w').write(ST)
+
+def vec(name, d):
+    x = '''<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path
+        android:pathData="%s"
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.4"
+        android:strokeLineJoin="round"/>
+</vector>
+''' % d
+    open(res + '/drawable/' + name + '.xml', 'w').write(x)
+
+vec('ic_n_prev', 'M6,6h2v12H6zM9.5,12l8.5,6V6z')
+vec('ic_n_play', 'M8,5v14l11,-7z')
+vec('ic_n_pause', 'M6,5h4v14H6zM14,5h4v14h-4z')
+vec('ic_n_next', 'M6,18l8.5,-6L6,6v12zM16,6v12h2V6h-2z')
 open(res + '/mipmap-anydpi-v26/ic_launcher.xml', 'w').write(AD)
 open(res + '/mipmap-anydpi-v26/ic_launcher_round.xml', 'w').write(AD)

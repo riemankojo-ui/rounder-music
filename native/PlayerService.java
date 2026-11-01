@@ -95,7 +95,7 @@ public class PlayerService extends Service {
                 .putString(MediaMetadata.METADATA_KEY_TITLE, title)
                 .putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
                 .putLong(MediaMetadata.METADATA_KEY_DURATION, dur);
-        if (art != null) mb.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, art);
+        // cover is not sent to the system, so the card keeps one fixed colour
         session.setMetadata(mb.build());
         long acts = PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE | PlaybackState.ACTION_PLAY_PAUSE
                 | PlaybackState.ACTION_SKIP_TO_NEXT | PlaybackState.ACTION_SKIP_TO_PREVIOUS
@@ -124,14 +124,21 @@ public class PlayerService extends Service {
                 .setCategory(Notification.CATEGORY_TRANSPORT)
                 .setVisibility(Notification.VISIBILITY_PUBLIC);
         if (art != null) b.setLargeIcon(art);
-        b.addAction(act(android.R.drawable.ic_media_previous, "Previous", "sp.prev", 1));
-        b.addAction(act(playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play,
+        b.setColor(0xFFB9A7FF);
+        if (Build.VERSION.SDK_INT >= 26) b.setColorized(false);
+        b.addAction(act(ico("ic_n_prev", android.R.drawable.ic_media_previous), "Previous", "sp.prev", 1));
+        b.addAction(act(playing ? ico("ic_n_pause", android.R.drawable.ic_media_pause) : ico("ic_n_play", android.R.drawable.ic_media_play),
                 playing ? "Pause" : "Play", "sp.pp", 2));
-        b.addAction(act(android.R.drawable.ic_media_next, "Next", "sp.next", 3));
+        b.addAction(act(ico("ic_n_next", android.R.drawable.ic_media_next), "Next", "sp.next", 3));
         b.setStyle(new Notification.MediaStyle()
                 .setMediaSession(session.getSessionToken())
                 .setShowActionsInCompactView(0, 1, 2));
         return b.build();
+    }
+
+    private int ico(String name, int fallback) {
+        int id = getResources().getIdentifier(name, "drawable", getPackageName());
+        return id != 0 ? id : fallback;
     }
 
     private Notification.Action act(int icon, String text, String action, int code) {

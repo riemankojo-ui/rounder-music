@@ -15,11 +15,23 @@ public class MainActivity extends BridgeActivity {
         int t = p.getInt("top", 0xFF1B1A26);
         int bt = p.getInt("bot", 0xFF0E0E12);
         Window w = getWindow();
+        w.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(t));
         w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         w.setStatusBarColor(t);
         w.setNavigationBarColor(bt);
         try {
             getBridge().getWebView().setBackgroundColor(t);
+        } catch (Exception e) { }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            android.webkit.WebView wv = getBridge().getWebView();
+            wv.setBackgroundColor(getSharedPreferences("sp", 0).getInt("top", 0xFF1B1A26));
+            wv.onResume();
+            wv.resumeTimers();
         } catch (Exception e) { }
     }
 }

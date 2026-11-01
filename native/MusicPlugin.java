@@ -488,6 +488,21 @@ public class MusicPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void setMeta(PluginCall call) {
+        final long id = call.getData().optLong("id", -1);
+        final String t = call.getString("title");
+        final String a = call.getString("artist");
+        final String al = call.getString("album");
+        post(call, () -> {
+            Song s = byId.get(id);
+            if (s == null) return;
+            if (t != null && !t.isEmpty()) s.title = t;
+            s.artist = a;
+            s.album = al;
+        });
+    }
+
+    @PluginMethod
     public void getState(PluginCall call) { post(call, () -> { }); }
 
     @PluginMethod
