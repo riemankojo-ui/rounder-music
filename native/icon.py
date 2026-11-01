@@ -51,5 +51,19 @@ AD = '''<?xml version="1.0" encoding="utf-8"?>
 
 open(res + '/drawable/sp_bg.xml', 'w').write(BG)
 open(res + '/drawable/sp_fg.xml', 'w').write(FG)
+
+ST = '''<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path
+        android:pathData="M18.72,4.86 C15.36,1.08 5.28,1.92 5.28,7.38 C5.28,12 18.72,11.16 18.72,16.62 C18.72,22.08 8.64,22.92 5.28,19.14"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="3.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"/>
+</vector>
+'''
+open(res + '/drawable/ic_stat_s.xml', 'w').write(ST)
 open(res + '/mipmap-anydpi-v26/ic_launcher.xml', 'w').write(AD)
 open(res + '/mipmap-anydpi-v26/ic_launcher_round.xml', 'w').write(AD)

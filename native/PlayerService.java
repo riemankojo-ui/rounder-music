@@ -15,7 +15,7 @@ import android.os.Build;
 import android.os.IBinder;
 
 public class PlayerService extends Service {
-    static final String CH = "rounder_player";
+    static final String CH = "rounder_player_v2";
     static PlayerService me;
     static String title = "Rounder Music", artist = "";
     static Bitmap art;
@@ -37,6 +37,8 @@ public class PlayerService extends Service {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel c = new NotificationChannel(CH, "Playback", NotificationManager.IMPORTANCE_LOW);
             c.setShowBadge(false);
+            c.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            getSystemService(NotificationManager.class).deleteNotificationChannel("rounder_player");
             getSystemService(NotificationManager.class).createNotificationChannel(c);
         }
         session = new MediaSession(this, "RounderMusic");
@@ -112,7 +114,7 @@ public class PlayerService extends Service {
         open.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, open,
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        b.setSmallIcon(android.R.drawable.ic_media_play)
+        b.setSmallIcon(getResources().getIdentifier("ic_stat_s", "drawable", getPackageName()) != 0 ? getResources().getIdentifier("ic_stat_s", "drawable", getPackageName()) : android.R.drawable.ic_media_play)
                 .setContentTitle(title)
                 .setContentText(artist)
                 .setContentIntent(pi)
