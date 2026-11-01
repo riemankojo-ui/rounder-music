@@ -503,6 +503,41 @@ public class MusicPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void getInfo(final PluginCall call) {
+        final long id = call.getData().optLong("id", -1);
+        new Thread(() -> {
+            JSObject r = new JSObject();
+            try {
+                Uri src = Build.VERSION.SDK_INT >= 29
+                        ? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+                        : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                Uri u = android.content.ContentUris.withAppendedId(src, id);
+                String[] cols = {MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.DATA,
+                        MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Media.DISPLAY_NAME};
+                Cursor c = getContext().getContentResolver().query(u, cols, null, null, null);
+                if (c != null) {
+                    try {
+                        if (c.moveToFirst()) {
+                            r.put("size", c.getLong(0));
+                            r.put("path", c.getString(1) == null ? "" : c.getString(1));
+                            r.put("mime", c.getString(2) == null ? "" : c.getString(2));
+                            r.put("name", c.getString(3) == null ? "" : c.getString(3));
+                        }
+                    } finally { c.close(); }
+                }
+                try {
+                    android.media.MediaMetadataRetriever m = new android.media.MediaMetadataRetriever();
+                    m.setDataSource(getContext(), u);
+                    String br = m.extractMetadata(android.media.MediaMetadataRetriever.METADATA_KEY_BITRATE);
+                    if (br != null) r.put("bitrate", Long.parseLong(br));
+                    m.release();
+                } catch (Exception e) { }
+            } catch (Exception e) { }
+            call.resolve(r);
+        }).start();
+    }
+
+    @PluginMethod
     public void getState(PluginCall call) { post(call, () -> { }); }
 
     @PluginMethod

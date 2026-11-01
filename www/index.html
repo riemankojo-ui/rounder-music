@@ -140,9 +140,75 @@ input[type=range]{width:100%;accent-color:var(--ac)}
 .tg.on i{background:var(--ac)}
 .tg.on i::after{transform:translateX(20px);background:#15131c}
 #aboutInfo{color:var(--txt);font-size:15px}
+#list{isolation:isolate;padding-bottom:96px}
+#fab{display:none!important}
+.endn{text-align:center;color:var(--mut);font-size:13px;padding:18px 0 8px;margin:16px 14px 0;border-top:1px solid rgba(255,255,255,.1)}
+.nxs:empty{display:none}
+.smm{color:var(--mut);margin-right:-6px}
+.finf{display:flex;justify-content:space-between;gap:16px;padding:12px;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px}
+.finf span{color:var(--mut);flex:none}
+.finf b{font-weight:500;text-align:right;word-break:break-all;min-width:0}
+#list.pgrid .pcw::before,#list.pgrid .pcw::after{content:'';position:absolute;width:100%;z-index:0;border-radius:0}
+#list.pgrid .pcw::before{top:5%;bottom:5%;right:-6px;background:rgba(255,255,255,.38)}
+#list.pgrid .pcw::after{top:10%;bottom:10%;right:-12px;background:rgba(255,255,255,.18)}
+#list.pgrid .pc.newc .pcw::before,#list.pgrid .pc.newc .pcw::after{display:none}
+#list.algrid{gap:8px;padding:6px 20px 150px 14px}
+#list.algrid .row.alc{grid-template-columns:48px 1fr auto;column-gap:18px}
+#list.algrid .acw{width:48px}
+#list.algrid .acw::before{right:-4px}
+#list.algrid .acw::after{right:-8px}
+#list.algrid .row.alc .art{font-size:18px}
+#list.algrid .row.alc .t{font-size:14px}
+#list.algrid .row.alc .s{font-size:12px}
+#list.algrid .alm{margin-left:-8px}
+#list.algrid .row.alc{row-gap:0}
+#list.algrid .row.alc .t{line-height:1.25}
+#list.algrid .row.alc .s{line-height:1.25;margin-top:2px}
+#list.algrid{gap:10px;padding:8px 22px 150px 14px}
+.row.alc{grid-template-columns:58px 1fr auto;column-gap:20px}
+.acw{width:58px}
+.acw::before{right:-4px}
+.acw::after{right:-8px}
+.row.alc .art{font-size:20px}
+.row.alc .t{font-size:15px}
+.row.alc .s{font-size:12px}
+.alm{margin-left:-10px}
+#list.algrid{display:grid;grid-template-columns:1fr;grid-auto-rows:max-content;gap:16px;align-content:start;padding:10px 30px 150px 14px}
+.row.alc{display:grid;grid-template-columns:84px 1fr auto;column-gap:30px;align-items:center;padding:0;min-width:0}
+.alm{grid-column:3;grid-row:1/3;color:var(--mut);margin-left:-16px}
+.acw{position:relative;grid-row:1/3;width:84px;aspect-ratio:1}
+.acw::before,.acw::after{content:'';position:absolute;width:100%;z-index:0;border-radius:0}
+.acw::before{top:5%;bottom:5%;right:-6px;background:rgba(255,255,255,.42)}
+.acw::after{top:10%;bottom:10%;right:-12px;background:rgba(255,255,255,.2)}
+.row.alc .art{position:relative;z-index:1;width:100%;height:100%;border-radius:0;font-size:28px;overflow:hidden}
+.row.alc .t{grid-column:2;font-size:16px;font-weight:600;align-self:end}
+.row.alc .s{grid-column:2;font-size:13px;align-self:start}
+.sec{padding:14px 10px 6px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.hs{display:flex;gap:12px;overflow-x:auto;padding:4px 10px 10px;scroll-snap-type:x proximity;scrollbar-width:none;overscroll-behavior-x:contain}
+.hs::-webkit-scrollbar{display:none}
+.row.nc{flex:none;flex-direction:column;align-items:stretch;gap:0;width:112px;padding:0;scroll-snap-align:start}
+.row.nc .art{width:112px;height:112px;font-size:30px}
+.row.nc .t{font-size:13px;font-weight:600;margin-top:8px}
+.row.nc .s{font-size:12px}
+#list.pgrid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:max-content;gap:20px 20px;align-content:start;padding:12px 22px 150px 14px}
+.pc{display:block;min-width:0;padding:0;background:none;border-radius:0}
+.pcw{position:relative;width:100%;aspect-ratio:1}
+.pcw::before,.pcw::after{content:'';position:absolute;width:100%;z-index:0;border-radius:0}
+.pcw::before{top:5%;bottom:5%;right:-6px;background:rgba(255,255,255,.42)}
+.pcw::after{top:10%;bottom:10%;right:-12px;background:rgba(255,255,255,.2)}
+.pc.newc .pcw::before{display:none}
+.pcw::before,.pcw::after{content:'';position:absolute;width:100%;z-index:0}
+.pcw::before{top:7%;bottom:7%;right:-6px;background:rgba(255,255,255,.16);border-radius:0 6px 6px 0}
+.pcw::after{top:14%;bottom:14%;right:-12px;background:rgba(255,255,255,.08);border-radius:0 6px 6px 0}
+.pc .art{position:relative;z-index:1;width:100%;height:100%;border-radius:8px;font-size:32px;overflow:hidden}
+.pc .t{text-align:center;font-weight:600;font-size:13px;margin-top:9px}
+.pc .s{text-align:center;font-size:11px}
+.pc.newc .pcw::before,.pc.newc .pcw::after{display:none}
+.pc.newc .art{background:var(--card);border:1px dashed rgba(255,255,255,.22);color:var(--ac);font-size:38px;font-weight:300}
 #zoom{position:fixed;inset:0;background:#000;z-index:70;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;overflow:hidden;touch-action:none}
 #zoom.open{opacity:1;pointer-events:auto}
-#zimg{flex:none;width:auto;height:auto;max-width:none;max-height:none;transform-origin:50% 50%;will-change:transform;user-select:none;-webkit-user-drag:none;touch-action:none}
+#zfr{flex:none;position:relative;overflow:hidden}
+#zimg{display:block;width:100%;height:100%;transform-origin:50% 50%;will-change:transform;user-select:none;-webkit-user-drag:none;touch-action:none}
 #zx{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:14px;width:46px;height:46px;display:grid;place-items:center;background:rgba(0,0,0,.45);z-index:2}
 #tgd{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:61}
 #tgd.open{opacity:1;pointer-events:auto}
@@ -166,7 +232,9 @@ body.compact .row:not(.acard) .t{font-size:15px}
 #pkbg{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
 #pkbg.open{opacity:1;pointer-events:auto}
 #pk{position:fixed;left:0;right:0;bottom:0;max-height:78%;display:flex;flex-direction:column;background:var(--bot);transform:translateY(110%);transition:transform .3s;box-shadow:0 -6px 24px rgba(0,0,0,.5);z-index:51;padding-bottom:10px}
-#pk.open{transform:none}
+#pk{transition:transform .15s ease-in}
+#pk.open{transform:none;transition:transform .26s cubic-bezier(.2,.8,.2,1)}
+#pkbg{transition:opacity .15s}
 #pk h3{padding:16px 20px 8px;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #pkl{flex:1;min-height:0;overflow-y:auto;padding:0 10px}
 .pki{display:flex;align-items:center;justify-content:space-between;padding:16px 12px;font-size:16px}
@@ -208,8 +276,8 @@ body.compact .row:not(.acard) .t{font-size:15px}
     <button class="tab" data-t="albums">Albums</button>
     <button class="tab" data-t="artists">Artists</button>
     <button class="tab" data-t="pl">Playlists</button>
-    <button class="tab" data-t="fav">Favorites</button>
     <button class="tab" data-t="rec">Recent</button>
+    <button class="tab" data-t="fav">Favorites</button>
   </div>
   <div id="sub" hidden><button class="ib" id="back" data-ic="back"></button><b id="subt"></b><button class="ib" id="plAdd" data-ic="plus" hidden></button><button class="ib" id="plMore" data-ic="more" hidden></button></div>
   <div id="cnt"></div>
@@ -291,6 +359,8 @@ body.compact .row:not(.acard) .t{font-size:15px}
     <div class="ph"><button class="ib" data-ic="back" data-pb></button><h3>Data</h3></div>
     <button class="sbtn" id="setClear">Clear recent list</button>
     <button class="sbtn" id="setFav">Clear favorites</button>
+    <button class="sbtn" id="setUnhide">Show hidden albums</button>
+    <button class="sbtn" id="setUnhideS">Show hidden songs</button>
     <button class="sbtn" id="setPls">Delete all playlists</button>
     <button class="sbtn" id="setReset">Reset settings</button>
   </div>
@@ -307,7 +377,8 @@ body.compact .row:not(.acard) .t{font-size:15px}
   <label class="tl">Album</label><input id="tgB" maxlength="120" autocomplete="off">
   <div class="dbtns"><button id="tgR">Reset</button><button id="tgNo">Cancel</button><button id="tgOk">Save</button></div>
 </div></div>
-<div id="zoom"><button id="zx"><svg viewBox="0 0 24 24" width="26" height="26" fill="#fff"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button><img id="zimg" alt=""></div>
+<div id="zoom"><button id="zx"><svg viewBox="0 0 24 24" width="26" height="26" fill="#fff"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button><div id="zfr"><img id="zimg" alt=""></div></div>
+<div id="nxp"><div class="nxh"><span id="nxh">Songs finished</span><button class="ib" id="nxx">✕</button></div><div class="nxs" id="nxs"></div></div>
 <div id="pkbg"></div>
 <div id="pk"><h3 id="pkt"></h3><div id="pkl"></div><button id="pkd">Done</button></div>
 <div id="dlg"><div class="dbox"><h3 id="dt"></h3><div id="dMsg"></div><input id="dIn" maxlength="40" placeholder="Playlist name" autocomplete="off"><div class="dbtns"><button id="dNo">Cancel</button><button id="dOk">OK</button></div></div></div>
@@ -440,12 +511,14 @@ function visible(){
   else if(tab==='fav')l=l.filter(s=>isFav(s.id));
   else if(tab==='rec')l=recent.map(i=>byId[i]).filter(Boolean);
   if(q)l=l.filter(s=>(s.title+' '+s.artist+' '+s.album).toLowerCase().includes(q));
+  l=l.filter(s=>!songHid.includes(s.id));
   return ((tab==='rec'&&!filter)||(filter&&filter.k==='pl'))?l:l.slice().sort(cmp);
 }
 function groups(k){
   const m=new Map();
   songs.filter(okS).forEach(s=>{
     if(q&&!s[k].toLowerCase().includes(q))return;
+    if(k==='album'&&albHid.includes(s.album))return;
     const g=m.get(s[k])||{n:s[k],c:0,f:s,a:s.artist};
     g.c++;m.set(s[k],g);
   });
@@ -453,10 +526,13 @@ function groups(k){
 }
 function row(id,t,s,h,attrs,on){
   const u=artC[id+'_160'];
-  return '<div class="row'+(on?' on':'')+'" '+attrs+'><div class="art" data-a="'+id+'">'+(u?'<img src="'+u+'">':'♪')+'</div><i class="eq"><b></b><b></b><b></b></i><div class="meta"><div class="t">'+esc(t)+'</div><div class="s">'+esc(s)+'</div></div>'+(h?'<button class="ib hrt'+(isFav(id)?' f':'')+'" data-f="'+id+'">'+ic(P.heart)+'</button>':'')+'</div>';
+  return '<div class="row'+(on?' on':'')+'" '+attrs+'><div class="art" data-a="'+id+'">'+(u?'<img src="'+u+'">':'♪')+'</div><i class="eq"><b></b><b></b><b></b></i><div class="meta"><div class="t">'+esc(t)+'</div><div class="s">'+esc(s)+'</div></div>'+(h?'<button class="ib smm" data-sm="'+id+'">'+ic(P.more)+'</button><button class="ib hrt'+(isFav(id)?' f':'')+'" data-f="'+id+'">'+ic(P.heart)+'</button>':'')+'</div>';
 }
 function render(){
+  $('cnt').style.display=(tab==='rec'&&!filter)?'none':'';
   $('list').classList.toggle('agrid',tab==='artists'&&!filter);
+  $('list').classList.toggle('pgrid',tab==='pl'&&!filter);
+  $('list').classList.toggle('algrid',tab==='albums'&&!filter);
   if(tab==='pl'&&!filter){renderPl();return}
   const grp=!filter&&(tab==='albums'||tab==='artists');
   let html='',n=0;
@@ -464,12 +540,19 @@ function render(){
     const k=tab==='albums'?'album':'artist';
     lastG=groups(k);n=lastG.length;
     $('cnt').textContent=n+' '+(tab==='albums'?'Albums':'Artists');
-    html=lastG.map((g,i)=>tab==='artists'?card(g,i):row(g.f.id,g.n,(tab==='albums'?g.a+' · ':'')+g.c+(g.c>1?' songs':' song'),false,'data-gi="'+i+'"',false)).join('');
+    html=lastG.map((g,i)=>tab==='artists'?card(g,i):tab==='albums'?albCard(g,i):row(g.f.id,g.n,(tab==='albums'?g.a+' · ':'')+g.c+(g.c>1?' songs':' song'),false,'data-gi="'+i+'"',false)).join('');
   }else{
     const l=visible();n=l.length;
     $('cnt').textContent=n+(n===1?' Song':' Songs')+((filter&&filter.k==='pl')?'':' · '+SORTS[sortM]);
-    html=l.map(s=>row(s.id,s.title,s.artist,true,'data-id="'+s.id+'"',s.id===shown)).join('');
+    if(tab==='rec'&&!filter){
+      const nw=q?[]:newest10(),pl=l.slice(0,20);
+      $('cnt').textContent='Newest '+nw.length+' · Played '+pl.length;
+      html=(nw.length?'<div class="sec">Newest</div><div class="hs">'+nw.map(newCard).join('')+'</div>':'')+
+        '<div class="sec">Recently played</div>'+
+        (pl.length?pl.map(s=>row(s.id,s.title,s.artist,true,'data-id="'+s.id+'"',s.id===shown)).join(''):'<div class="empty" style="margin-top:30px">Songs you play will show up here</div>');
+    }else html=l.map(s=>row(s.id,s.title,s.artist,true,'data-id="'+s.id+'"',s.id===shown)).join('');
   }
+  if(html&&!grp)html+='<div class="endn">End of list · '+n+(n===1?' song':' songs')+'</div>';
   $('list').innerHTML=html||'<div class="empty">Nothing here yet</div>';
   if(!render.f&&html){
     render.f=1;
@@ -480,6 +563,27 @@ function render(){
 function card(g,i){
   const u=artC[g.f.id+'_160'];
   return '<div class="row acard" data-gi="'+i+'"><div class="art" data-a="'+g.f.id+'">'+(u?'<img src="'+u+'">':esc(g.n.charAt(0).toUpperCase()))+'</div><div class="t">'+esc(g.n)+'</div><div class="s">'+g.c+(g.c>1?' songs':' song')+'</div></div>';
+}
+function albCard(g,i){
+  const u=artC[g.f.id+'_160'];
+  return '<div class="row alc" data-gi="'+i+'"><div class="acw"><div class="art" data-a="'+g.f.id+'">'+(u?'<img src="'+u+'">':'♪')+'</div></div><div class="t">'+esc(g.n)+'</div><div class="s">'+esc(g.a)+' · '+g.c+(g.c>1?' songs':' song')+'</div><button class="ib alm" data-am="'+i+'">'+ic(P.more)+'</button></div>';
+}
+function fmtSize(b){return b>1048576?(b/1048576).toFixed(1)+' MB':Math.round(b/1024)+' KB'}
+function fmtDur(ms){const t=Math.round(ms/1000);return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')}
+async function fileInfo(id){
+  const s=byId[id];if(!s)return;
+  let i={};
+  try{i=(await Music.getInfo({id:id}))||{}}catch(e){}
+  const ad=s.added?new Date(s.added>1e11?s.added:s.added*1000).toLocaleDateString():'';
+  const rows=[['Title',s.title],['Artist',s.artist||'Unknown'],['Album',s.album||'Unknown'],['Length',fmtDur(s.dur)],
+    ['Format',i.mime||''],['Bitrate',i.bitrate?Math.round(i.bitrate/1000)+' kbps':''],['Size',i.size?fmtSize(i.size):''],
+    ['Added',ad],['File name',i.name||''],['Path',i.path||'']].filter(r=>r[1]);
+  sheet('File information',rows.map(r=>'<div class="finf"><span>'+r[0]+'</span><b>'+esc(String(r[1]))+'</b></div>').join(''));
+}
+function newest10(){return songs.filter(okS).sort((a,b)=>b.added-a.added).slice(0,10)}
+function newCard(s){
+  const u=artC[s.id+'_160'];
+  return '<div class="row nc'+(s.id===shown?' on':'')+'" data-nw="'+s.id+'" data-id="'+s.id+'"><div class="art" data-a="'+s.id+'">'+(u?'<img src="'+u+'">':'♪')+'</div><div class="t">'+esc(s.title)+'</div><div class="s">'+esc(s.artist)+'</div></div>';
 }
 function markOn(){
   document.querySelectorAll('.row[data-id],.row[data-q]').forEach(r=>r.classList.toggle('on',+(r.dataset.id||r.dataset.q)===shown));
@@ -502,6 +606,11 @@ $('list').onclick=e=>{
   if(f){togFav(+f.dataset.f);return}
   const r=e.target.closest('.row');
   if(!r)return;
+  const sm=e.target.closest('[data-sm]');
+  if(sm){songMenu(+sm.dataset.sm);return}
+  const am=e.target.closest('[data-am]');
+  if(am){albMenu(+am.dataset.am);return}
+  if(r.dataset.nw!==undefined){startQueue(newest10(),+r.dataset.nw);return}
   if(r.dataset.new!==undefined){newPl().then(p=>{if(p){openPl(p.id);picker(p.id)}});return}
   if(r.dataset.pi!==undefined){openPl(pls[+r.dataset.pi].id);return}
   if(r.dataset.gi!==undefined){
@@ -532,14 +641,15 @@ const lazyArt=c=>c.querySelectorAll('.art[data-a]').forEach(el=>{if(!el.querySel
 function renderPl(){
   const l=pls.map((p,i)=>({p:p,i:i})).filter(o=>!q||o.p.n.toLowerCase().includes(q));
   $('cnt').textContent=pls.length+(pls.length===1?' Playlist':' Playlists');
-  $('list').innerHTML='<div class="row" data-new="1"><div class="art plus">+</div><div class="meta"><div class="t">New playlist</div><div class="s">Create one and add your songs</div></div></div>'+
+  $('list').innerHTML='<div class="row pc newc" data-new="1"><div class="pcw"><div class="art">+</div></div><div class="t">New playlist</div><div class="s">Create and add songs</div></div>'+
     l.map(o=>{
       const f=o.p.s.find(id=>byId[id]),n=o.p.s.filter(id=>byId[id]).length;
-      return row(f||0,o.p.n,n+(n===1?' song':' songs'),false,'data-pi="'+o.i+'"',false);
+      return '<div class="row pc" data-pi="'+o.i+'"><div class="pcw"><div class="art"'+(f?' data-a="'+f+'"':'')+'>♪</div></div><div class="t">'+esc(o.p.n)+'</div><div class="s">'+n+(n===1?' song':' songs')+'</div></div>';
     }).join('');
-  $('list').querySelectorAll('.art').forEach(el=>{
-    if(el.dataset.a&&el.dataset.a!=='0'&&!el.querySelector('img'))io.observe(el);
+  $('list').querySelectorAll('.pc .art[data-a]').forEach(el=>{
+    loadArt(el.dataset.a,400).then(u=>{if(u)el.innerHTML='<img src="'+u+'">'});
   });
+
 }
 function openPl(id){
   const p=plBy(id);if(!p)return;
@@ -585,7 +695,7 @@ function sheet(title,html){
 }
 function closeSheet(){
   PK.classList.remove('open');$('pkbg').classList.remove('open');
-  if(pkDirty){pkDirty=false;render()}
+  if(pkDirty){pkDirty=false;setTimeout(render,170)}
 }
 $('pkbg').onclick=closeSheet;
 $('pkd').onclick=closeSheet;
@@ -593,7 +703,7 @@ $('pkd').onclick=closeSheet;
 function songMenu(id){
   const s=byId[id];if(!s)return;
   pkId=id;
-  let h='<div class="pki" data-do="add">Add to playlist</div><div class="pki" data-do="tag">Edit tags</div>';
+  let h='<div class="pki" data-do="add">Add to playlist</div><div class="pki" data-do="tag">Edit tags</div><div class="pki" data-do="info">File information</div><div class="pki dng" data-do="hide">Hide song</div>';
   if(filter&&filter.k==='pl')h+='<div class="pki" data-do="rm">Remove from this playlist</div>';
   sheet(s.title,h);
 }
@@ -621,6 +731,22 @@ $('pkl').onclick=e=>{
   const d=e.target.closest('[data-do]');if(!d)return;
   const w=d.dataset.do;
   if(w==='add')chooser(pkId);
+  else if(w==='aren'){
+    const nm=alName;closeSheet();
+    ask('Rename album',{ok:'Save',value:nm}).then(v=>{
+      if(!v||v===nm)return;
+      [...new Set(songs.filter(s=>s.album===nm).map(s=>s.ab||s.album))].forEach(b=>{albRen[b]=v});
+      albHid=albHid.map(x=>x===nm?v:x);
+      saveAl();afterAl();
+    });
+  }else if(w==='ahide'){
+    const nm=alName;closeSheet();
+    ask('Hide album?',{ok:'Hide',msg:'"'+nm+'" will be hidden from Albums. Your songs stay in the library. You can show it again in Settings › Data.'}).then(ok=>{
+      if(ok){albHid.push(nm);saveAl();render()}
+    });
+  }
+  else if(w==='info'){fileInfo(pkId)}
+  else if(w==='hide'){songHid.push(pkId);saveHid();pkDirty=true;closeSheet()}
   else if(w==='tag'){const sid=pkId;closeSheet();editTags(sid)}
   else if(w==='rm'){
     const p=plBy(filter&&filter.v);
@@ -719,7 +845,7 @@ $('fab').onclick=()=>{
 const OPT0={rows:0,fab:1,one:0,min:0,hap:1};
 let opt=Object.assign({},OPT0);try{Object.assign(opt,JSON.parse(localStorage.opt||'{}'))}catch(e){}
 const saveOpt=()=>{try{localStorage.opt=JSON.stringify(opt)}catch(e){}};
-const okS=s=>!opt.min||s.dur>=opt.min*1000;
+const okS=s=>(!opt.min||s.dur>=opt.min*1000)&&!songHid.includes(s.id);
 function applyOpt(){
   document.body.classList.toggle('compact',!!opt.rows);
   document.body.classList.toggle('nofab',!opt.fab);
@@ -727,6 +853,8 @@ function applyOpt(){
 function drawSet2(){
   SET.querySelectorAll('[data-o]').forEach(b=>b.classList.toggle('on',+b.dataset.v===opt[b.dataset.o]));
   SET.querySelectorAll('.tg').forEach(t=>t.classList.toggle('on',!!opt[t.dataset.t]));
+  $('setUnhideS').textContent='Show hidden songs ('+songHid.length+')';
+  $('setUnhide').textContent='Show hidden albums ('+albHid.length+')';
   $('aboutInfo').textContent=songs.length+' songs · '+pls.length+' playlists · '+favs.length+' favorites';
 }
 function resetPages(){SET.classList.remove('sub');SET.querySelectorAll('.spage').forEach(p=>p.classList.remove('open'))}
@@ -748,6 +876,8 @@ SET.addEventListener('click',e=>{
 $('setFav').onclick=()=>ask('Clear favorites?',{ok:'Clear',msg:'All your hearts will be removed.'}).then(ok=>{
   if(ok){favs=[];localStorage.favs='[]';updFav();document.querySelectorAll('[data-f]').forEach(b=>b.classList.remove('f'));if(tab==='fav')render();drawSet2()}
 });
+$('setUnhideS').onclick=()=>{if(!songHid.length)return;songHid=[];saveHid();render();drawSet2()};
+$('setUnhide').onclick=()=>{if(!albHid.length)return;albHid=[];saveAl();render();drawSet2()};
 $('setPls').onclick=()=>ask('Delete all playlists?',{ok:'Delete',msg:'Your songs stay on your phone.'}).then(ok=>{
   if(ok){pls=[];savePls();if(tab==='pl'||filter)leaveSub();drawSet2()}
 });
@@ -786,6 +916,17 @@ applyOpt();
 /* ---------- tag editor ---------- */
 let tags={};try{tags=JSON.parse(localStorage.tags||'{}')}catch(e){}
 let tgId=0;
+let songHid=[];try{songHid=JSON.parse(localStorage.songHid||'[]')}catch(e){}
+const saveHid=()=>{try{localStorage.songHid=JSON.stringify(songHid)}catch(e){}};
+let albRen={},albHid=[],alName='';
+try{albRen=JSON.parse(localStorage.albRen||'{}');albHid=JSON.parse(localStorage.albHid||'[]')}catch(e){}
+const saveAl=()=>{try{localStorage.albRen=JSON.stringify(albRen);localStorage.albHid=JSON.stringify(albHid)}catch(e){}};
+function afterAl(){applyTags();render()}
+function albMenu(i){
+  const g=lastG[i];if(!g)return;
+  alName=g.n;
+  sheet(g.n,'<div class="pki" data-do="aren">Rename album</div><div class="pki dng" data-do="ahide">Hide album</div>');
+}
 const saveTags=()=>{try{localStorage.tags=JSON.stringify(tags)}catch(e){}};
 function pushMeta(s){
   if(!Music.setMeta)return;
@@ -798,7 +939,8 @@ function applyTags(){
     const t=tags[s.id];
     s.title=(t&&t.title)||s.o.title;
     s.artist=(t&&t.artist)||s.o.artist;
-    s.album=(t&&t.album)||s.o.album;
+    s.ab=(t&&t.album)||s.o.album;
+    s.album=albRen[s.ab]||s.ab;
     if(t)pushMeta(s);
   });
 }
@@ -831,18 +973,18 @@ $('tgR').onclick=()=>{
 
 /* ---------- full-screen cover viewer (pinch, double/triple tap) ---------- */
 (function(){
-  const Z=$('zoom'),I=$('zimg');
+  const Z=$('zoom'),I=$('zimg'),F=$('zfr');let dragY=0;
   let s=1,x=0,y=0,P=new Map(),d0=0,s0=1,x0=0,y0=0,m0=null,sx=0,sy=0,px=0,py=0,moved=false,lastT=0,cnt=0,multi=false;
   const cx=()=>innerWidth/2,cy=()=>innerHeight/2;
   function fit(){
     const nw=I.naturalWidth,nh=I.naturalHeight;if(!nw||!nh)return;
     const f=Math.min(innerWidth/nw,innerHeight/nh);
-    I.style.width=Math.round(nw*f)+'px';I.style.height=Math.round(nh*f)+'px';
+    F.style.width=Math.round(nw*f)+'px';F.style.height=Math.round(nh*f)+'px';
     clamp();apply(false);
   }
   const apply=a=>{I.style.transition=a?'transform .22s ease-out':'none';I.style.transform='translate('+x+'px,'+y+'px) scale('+s+')'};
   const clamp=()=>{
-    const w=I.clientWidth*s,h=I.clientHeight*s,mx=Math.max(0,(w-innerWidth)/2),my=Math.max(0,(h-innerHeight)/2);
+    const mx=F.clientWidth*(s-1)/2,my=F.clientHeight*(s-1)/2;
     x=Math.max(-mx,Math.min(mx,x));y=Math.max(-my,Math.min(my,y));
   };
   const zoomAt=(fx,fy,ns)=>{
@@ -863,7 +1005,7 @@ $('tgR').onclick=()=>{
       }).catch(()=>{});
     }catch(e){}
   };
-  window.closeZoom=function(){Z.classList.remove('open');Z.style.background=''};
+  window.closeZoom=function(){Z.classList.remove('open');Z.style.background='';setTimeout(()=>{F.style.transition='none';F.style.transform='';dragY=0},220)};
   Z.addEventListener('pointerdown',e=>{
     if(e.target.closest('#zx'))return;
     Z.setPointerCapture(e.pointerId);
@@ -888,7 +1030,7 @@ $('tgR').onclick=()=>{
     const dx=e.clientX-sx,dy=e.clientY-sy;
     if(Math.abs(dx)>6||Math.abs(dy)>6)moved=true;
     if(s>1){x=px+dx;y=py+dy;clamp();apply(false)}
-    else if(dy>0&&moved){x=0;y=dy;apply(false);Z.style.background='rgba(0,0,0,'+Math.max(.2,1-dy/500)+')'}
+    else if(dy>0&&moved){dragY=dy;F.style.transition='none';F.style.transform='translateY('+dy+'px)';Z.style.background='rgba(0,0,0,'+Math.max(.2,1-dy/500)+')'}
   });
   const up=e=>{
     if(!P.has(e.pointerId))return;
@@ -907,8 +1049,9 @@ $('tgR').onclick=()=>{
       return;
     }
     if(s===1){
-      if(y>120)closeZoom();
-      else{y=0;apply(true);Z.style.background=''}
+      if(dragY>120)closeZoom();
+      else{F.style.transition='transform .22s ease-out';F.style.transform='';Z.style.background=''}
+      dragY=0;
     }
   };
   Z.addEventListener('pointerup',up);
@@ -936,7 +1079,7 @@ function showTrack(id,played){
   loadArt(id,160).then(u=>setArt($('mArt'),u,id));
   loadArt(id,600).then(u=>setArt($('bigart'),u,id));
   mkBars(id);drawWave();
-  if(played){recent=[id,...recent.filter(x=>x!==id)].slice(0,30);localStorage.recent=JSON.stringify(recent)}
+  if(played){recent=[id,...recent.filter(x=>x!==id)].slice(0,20);localStorage.recent=JSON.stringify(recent)}
   updFav();markOn();
 }
 function apply(s){
@@ -959,7 +1102,7 @@ document.body.classList.toggle('pl',s.playing);
   }
   if(s.id>0&&!!s.ended!==!!st.ended){
     const sb=byId[s.id];
-    const sub=s.ended?'Last down':(sb?sb.artist+(sb.album&&sb.album!=='Unknown Album'?' · '+sb.album:''):'');
+    const sub=s.ended?'Songs finished':(sb?sb.artist+(sb.album&&sb.album!=='Unknown Album'?' · '+sb.album:''):'');
     $('ms').textContent=$('fs').textContent=sub;
   }
   s.speed=Math.round(s.speed*100)/100;
