@@ -60,6 +60,7 @@ public class MusicPlugin extends Plugin {
     private final Random rnd = new Random();
     private MediaPlayer mp;
     private boolean prepared = false;
+    private boolean ended = false;
     private int index = -1;
     private long curId = -1;
     private boolean shuffle = false;
@@ -243,7 +244,9 @@ public class MusicPlugin extends Plugin {
         o.put("dur", dur);
         o.put("shuffle", shuffle);
         o.put("repeat", repeat);
+        o.put("ended", ended);
         o.put("speed", (double) speed);
+        o.put("vol", volPct());
         o.put("sleep", sleepAt > 0 ? Math.max(0, sleepAt - System.currentTimeMillis()) : 0);
         return o;
     }
@@ -353,6 +356,7 @@ public class MusicPlugin extends Plugin {
             focus();
             int d = mp.getDuration();
             if (d > 0 && mp.getCurrentPosition() >= d - 300) mp.seekTo(0);
+            ended = false;
             mp.start();
             applySpeed();
             Song s = byId.get(curId);
@@ -410,6 +414,7 @@ public class MusicPlugin extends Plugin {
             mp.setDataSource(getContext(), Uri.parse(s.uri));
             mp.prepare();
             prepared = true;
+            ended = false;
             index = i;
             curId = s.id;
             focus();
@@ -434,7 +439,7 @@ public class MusicPlugin extends Plugin {
         if (shuffle && queue.size() > 1) { playIndex(randomOther(), 0); return; }
         if (index + 1 < queue.size()) playIndex(index + 1, 0);
         else if (repeat == 1 && !queue.isEmpty()) playIndex(0, 0);
-        else stopSvc();
+        else { ended = true; stopSvc(); }
     }
 
     @PluginMethod
@@ -461,6 +466,24 @@ public class MusicPlugin extends Plugin {
         post(call, () -> {
             int i = queue.indexOf(id);
             if (i >= 0) playIndex(i, 0);
+        });
+    }
+
+    private int volPct() {
+        try {
+            AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+            int mx = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            return mx > 0 ? Math.round(am.getStreamVolume(AudioManager.STREAM_MUSIC) * 100f / mx) : 0;
+        } catch (Exception e) { return 0; }
+    }
+
+    @PluginMethod
+    public void setVolume(PluginCall call) {
+        final int pct = call.getData().optInt("pct", 50);
+        post(call, () -> {
+            AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+            int mx = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, Math.round(Math.max(0, Math.min(100, pct)) * mx / 100f), 0);
         });
     }
 
