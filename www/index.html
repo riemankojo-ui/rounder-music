@@ -751,6 +751,8 @@ $('pkl').onclick=e=>{
     });
   }
   else if(w==='info'){fileInfo(pkId)}
+  else if(w==='padd'){picker(pkId)}
+  else if(w==='pdel'){const p=plBy(pkId);closeSheet();if(p)ask('Remove playlist?',{ok:'Remove',msg:'"'+p.n+'" will be removed. Your songs stay on your phone.'}).then(ok=>{if(ok){pls=pls.filter(x=>x!==p);savePls();render()}})}
   else if(w==='hide'){songHid.push(pkId);saveHid();pkDirty=true;closeSheet()}
   else if(w==='tag'){const sid=pkId;closeSheet();editTags(sid)}
   else if(w==='rm'){
@@ -774,6 +776,7 @@ $('pkl').onclick=e=>{
   }
 };
 $('plAdd').onclick=()=>picker(filter.v);
+function plMenu(id){const p=plBy(id);if(!p)return;pkId=id;sheet(p.n,'<div class="pki" data-do="padd">Add songs</div><div class="pki dng" data-do="pdel">Remove playlist</div>')}
 $('plMore').onclick=()=>{
   const p=plBy(filter.v);if(!p)return;
   sheet(p.n,'<div class="pki" data-do="ren">Rename playlist</div><div class="pki dng" data-do="del">Delete playlist</div>');
@@ -783,7 +786,7 @@ $('plMore').onclick=()=>{
 (function(){
   const L=$('list');let tm=0,sx=0,sy=0,fired=false;
   L.addEventListener('touchstart',e=>{
-    const r=e.target.closest('.row[data-id]');if(!r)return;
+    const r=e.target.closest('.row[data-id],.row[data-pi]');if(!r)return;if(r.dataset.pi!==undefined){fired=false;sx=e.touches[0].clientX;sy=e.touches[0].clientY;tm=setTimeout(()=>{fired=true;if(opt.hap&&navigator.vibrate)navigator.vibrate(15);plMenu(pls[+r.dataset.pi].id)},500);return}
     fired=false;sx=e.touches[0].clientX;sy=e.touches[0].clientY;
     tm=setTimeout(()=>{fired=true;if(opt.hap&&navigator.vibrate)navigator.vibrate(15);songMenu(+r.dataset.id)},500);
   },{passive:true});
