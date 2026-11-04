@@ -10,6 +10,7 @@ mf = 'android/app/src/main/AndroidManifest.xml'
 s = open(mf).read()
 if 'READ_MEDIA_AUDIO' not in s:
     perms = '''
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
@@ -27,3 +28,10 @@ st = 'android/app/src/main/res/values/styles.xml'
 if os.path.exists(st):
     t = open(st).read().replace('@drawable/splash', '#FF121212')
     open(st, 'w').write(t)
+# Add jaudiotagger for editing physical files
+bg = 'android/app/build.gradle'
+if os.path.exists(bg):
+    bs = open(bg).read()
+    if 'jaudiotagger' not in bs:
+        bs = bs.replace('dependencies {', 'dependencies {\n    implementation "com.github.Adonai:jaudiotagger:2.2.5"')
+        open(bg, 'w').write(bs)

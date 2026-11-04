@@ -119,9 +119,10 @@ public class MusicPlugin extends Plugin {
                         ? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
                         : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 String[] cols = {
-                        MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE,
-                        MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
-                        MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.DATE_ADDED};
+        MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE,
+        MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
+        MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.DATE_ADDED,
+        MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME};
                 String sel = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " + MediaStore.Audio.Media.DURATION + " >= 15000";
                 JSArray arr = new JSArray();
                 byId.clear();
@@ -144,6 +145,8 @@ public class MusicPlugin extends Plugin {
                             o.put("album", s.album == null ? "" : s.album);
                             o.put("dur", c.getLong(4));
                             o.put("added", c.getLong(5));
+o.put("path", c.getString(6) == null ? "" : c.getString(6));
+o.put("name", c.getString(7) == null ? "" : c.getString(7));
                             arr.put(o);
                         }
                     } finally {
@@ -615,7 +618,65 @@ public class MusicPlugin extends Plugin {
         });
     }
 
-    // ---------- status bar + navigation bar colors ----------
+    // ---------- write physical tags ----------
+@PluginMethod
+public void writeTags(PluginCall call) {
+    final long id = call.getData().optLong("id", -1);
+    final String title = call.getString("title");
+    final String artist = call.getString("artist");
+    final String album = call.getString("album");
+    final String coverBase64 = call.getString("cover");
+
+    new Thread(() -> {
+        try {
+            Song s = byId.get(id);
+            if (s == null) { call.reject("Song not found"); return; }
+            
+            Uri src = Build.VERSION.SDK_INT >= 29 ? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Uri u = android.content.ContentUris.withAppendedId(src, id);
+            Cursor c = getContext().getContentResolver().query(u, new String[]{MediaStore.Audio.Media.DATA}, null, null, null);
+            String path = null;
+            if (c != null) { if (c.moveToFirst()) path = c.getString(0); c.close(); }
+            
+            if (path == null || path.isEmpty()) { call.reject("File path not found"); return; }
+
+            java.io.File file = new java.io.File(path);
+            if (!file.exists()) { call.reject("File does not exist"); return; }
+            if (!file.canWrite()) { call.reject("No write permission. Please grant 'All Files Access' in settings."); return; }
+
+            // Use jaudiotagger to write to the file
+            org.jaudiotagger.audio.AudioFile f = org.jaudiotagger.audio.AudioFileIO.read(file);
+            org.jaudiotagger.tag.Tag tag = f.getTag();
+            if (tag == null) { tag = f.createDefaultTag(); f.setTag(tag); }
+
+            if (title != null) tag.setField(org.jaudiotagger.tag.FieldKey.TITLE, title);
+            if (artist != null) tag.setField(org.jaudiotagger.tag.FieldKey.ARTIST, artist);
+            if (album != null) tag.setField(org.jaudiotagger.tag.FieldKey.ALBUM, album);
+
+            if (coverBase64 != null && !coverBase64.isEmpty()) {
+                byte[] imgData = Base64.decode(coverBase64, Base64.DEFAULT);
+                tag.deleteArtworkField();
+                org.jaudiotagger.tag.images.Artwork artwork = org.jaudiotagger.tag.images.ArtworkFactory.getNew();
+                artwork.setBinaryData(imgData);
+                artwork.setMimeType("image/jpeg");
+                artwork.setDescription("Cover");
+                tag.setField(artwork);
+            }
+
+            org.jaudiotagger.audio.AudioFileIO.write(f);
+            
+            // Clear cache so the app loads the new image immediately
+            java.io.File cf = new java.io.File(getContext().getCacheDir(), "art_" + id + "_600.jpg");
+            if (cf.exists()) cf.delete();
+
+            call.resolve();
+        } catch (Exception e) {
+            call.reject(e.getMessage() == null ? "Write error" : e.getMessage());
+        }
+    }).start();
+}
+
+// ---------- status bar + navigation bar colors ----------
     @PluginMethod
     public void setBars(final PluginCall call) {
         final String top = call.getString("top");

@@ -19,10 +19,18 @@ public class MainActivity extends BridgeActivity {
         w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         w.setStatusBarColor(t);
         w.setNavigationBarColor(bt);
+            try {
+        getBridge().getWebView().setBackgroundColor(t);
+    } catch (Exception e) { }
+
+    if (android.os.Build.VERSION.SDK_INT >= 30 && !android.os.Environment.isExternalStorageManager()) {
         try {
-            getBridge().getWebView().setBackgroundColor(t);
+            android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            intent.setData(android.net.Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
         } catch (Exception e) { }
     }
+}
 
     @Override
     public void onResume() {
