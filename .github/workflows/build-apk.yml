@@ -59,7 +59,6 @@ jobs:
             cp -r "$GITHUB_WORKSPACE/native" native
             python3 native/patch.py
             python3 native/icon.py
-            sed -i "s|mavenCentral()|mavenCentral()\n        maven { url 'https://jitpack.io' }|" android/build.gradle
           fi
           if [ -f "$GITHUB_WORKSPACE/FolderAccessPlugin.java" ]; then
             PKG_DIR="android/app/src/main/java/$(echo "$APP_ID" | tr . /)"

@@ -35,5 +35,5 @@ bg = 'android/app/build.gradle'
 if os.path.exists(bg):
     bs = open(bg).read()
     if 'jaudiotagger' not in bs:
-        bs = bs.replace('dependencies {', 'dependencies {\n    implementation "com.github.Adonai:jaudiotagger:2.2.5"')
+        bs = bs.replace('dependencies {', 'dependencies {\n    implementation "net.jthink:jaudiotagger:3.0.1"')
         open(bg, 'w').write(bs)
