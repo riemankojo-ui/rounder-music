@@ -37,7 +37,9 @@ jobs:
       - name: Prepare web files
         run: |
           mkdir -p "$RUNNER_TEMP/www"
-          if [ -f package.json ] && grep -q '"build"' package.json; then
+          if [ -f www/index.html ]; then
+            cp -r www/. "$RUNNER_TEMP/www/"
+          elif [ -f package.json ] && grep -q '"build"' package.json; then
             npm install
             npm run build
             if [ -d dist ]; then cp -r dist/. "$RUNNER_TEMP/www/"; else cp -r build/. "$RUNNER_TEMP/www/"; fi
@@ -49,10 +51,16 @@ jobs:
           mkdir "$RUNNER_TEMP/cap"
           cd "$RUNNER_TEMP/cap"
           npm init -y
-          npm install @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8
+          npm install @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8 @capacitor/app@8
           mv "$RUNNER_TEMP/www" www
           npx cap init "$APP_NAME" "$APP_ID" --web-dir www
           npx cap add android
+          if [ -d "$GITHUB_WORKSPACE/native" ]; then
+            cp -r "$GITHUB_WORKSPACE/native" native
+            python3 native/patch.py
+            python3 native/icon.py
+            sed -i "s|mavenCentral()|mavenCentral()\n        maven { url 'https://jitpack.io' }|" android/build.gradle
+          fi
           if [ -f "$GITHUB_WORKSPACE/FolderAccessPlugin.java" ]; then
             PKG_DIR="android/app/src/main/java/$(echo "$APP_ID" | tr . /)"
             mkdir -p "$PKG_DIR"

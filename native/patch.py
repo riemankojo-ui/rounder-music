@@ -1,10 +1,12 @@
-import os, shutil
+import os, re
 
-dst = 'android/app/src/main/java/com/rieman/softplayer'
+dst = 'android/app/src/main/java/' + os.environ['APP_ID'].replace('.', '/')
 os.makedirs(dst, exist_ok=True)
 for f in os.listdir('native'):
     if f.endswith('.java'):
-        shutil.copy('native/' + f, dst + '/' + f)
+        t = open('native/' + f).read()
+        t = re.sub(r'^package .*;', 'package ' + os.environ['APP_ID'] + ';', t, count=1, flags=re.M)
+        open(dst + '/' + f, 'w').write(t)
 
 mf = 'android/app/src/main/AndroidManifest.xml'
 s = open(mf).read()
