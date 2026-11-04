@@ -30,6 +30,10 @@ st = 'android/app/src/main/res/values/styles.xml'
 if os.path.exists(st):
     t = open(st).read().replace('@drawable/splash', '#FF17232F')
     open(st, 'w').write(t)
+    t = open(st).read()
+    if 'Theme.SplashScreen' in t and 'windowSplashScreenAnimatedIcon' not in t:
+        t = re.sub(r'(<style name="AppTheme\.NoActionBarLaunch"[^>]*>)', r'\1\n        <item name="windowSplashScreenBackground">#FF17232F</item>\n        <item name="windowSplashScreenAnimatedIcon">@drawable/sp_fg</item>', t, count=1)
+        open(st, 'w').write(t)
 # Add jaudiotagger for editing physical files
 bg = 'android/app/build.gradle'
 if os.path.exists(bg):
