@@ -37,3 +37,9 @@ if os.path.exists(bg):
     if 'jaudiotagger' not in bs:
         bs = bs.replace('dependencies {', 'dependencies {\n    implementation "net.jthink:jaudiotagger:3.0.1"')
         open(bg, 'w').write(bs)
+sv = 'android/app/src/main/res/values/strings.xml'
+if os.path.exists(sv):
+    t = open(sv).read()
+    t = re.sub(r'(<string name="app_name">)[^<]*(</string>)', r'\1Rounder Music\2', t)
+    t = re.sub(r'(<string name="title_activity_main">)[^<]*(</string>)', r'\1Rounder Music\2', t)
+    open(sv, 'w').write(t)
