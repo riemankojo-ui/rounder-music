@@ -691,6 +691,7 @@ public void writeTags(PluginCall call) {
                 w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 w.setStatusBarColor(t);
                 w.setNavigationBarColor(b);
+                w.setBackgroundDrawable(new android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM, new int[]{t, b}));
                 if (Build.VERSION.SDK_INT >= 28) w.setNavigationBarDividerColor(Color.TRANSPARENT);
                 if (Build.VERSION.SDK_INT >= 29) w.setNavigationBarContrastEnforced(false);
                 getContext().getSharedPreferences("sp", 0).edit().putInt("top", t).putInt("bot", b).apply();

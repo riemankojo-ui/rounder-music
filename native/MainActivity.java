@@ -15,7 +15,8 @@ public class MainActivity extends BridgeActivity {
         int t = p.getInt("top", 0xFF1B1A26);
         int bt = p.getInt("bot", 0xFF0E0E12);
         Window w = getWindow();
-        w.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(t));
+        w.setBackgroundDrawable(new android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM, new int[]{t, bt}));
+        if (android.os.Build.VERSION.SDK_INT >= 29) w.setNavigationBarContrastEnforced(false);
         w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         w.setStatusBarColor(t);
         w.setNavigationBarColor(bt);
