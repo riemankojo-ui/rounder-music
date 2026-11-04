@@ -12,8 +12,8 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(MusicPlugin.class);
         super.onCreate(b);
         SharedPreferences p = getSharedPreferences("sp", 0);
-        int t = p.getInt("top", 0xFF1B1A26);
-        int bt = p.getInt("bot", 0xFF0E0E12);
+        int t = p.getInt("top", 0xFF17232F);
+        int bt = p.getInt("bot", 0xFF0F151C);
         Window w = getWindow();
         w.setBackgroundDrawable(new android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM, new int[]{t, bt}));
         if (android.os.Build.VERSION.SDK_INT >= 29) w.setNavigationBarContrastEnforced(false);
@@ -38,7 +38,7 @@ public class MainActivity extends BridgeActivity {
         super.onResume();
         try {
             android.webkit.WebView wv = getBridge().getWebView();
-            wv.setBackgroundColor(getSharedPreferences("sp", 0).getInt("top", 0xFF1B1A26));
+            wv.setBackgroundColor(getSharedPreferences("sp", 0).getInt("top", 0xFF17232F));
             wv.onResume();
             wv.resumeTimers();
         } catch (Exception e) { }

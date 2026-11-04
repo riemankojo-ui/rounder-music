@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>Rounder Music</title>
 <style>
-:root{--top:#1b1a26;--bot:#0e0e12;--ac:#b9a7ff;--card:rgba(255,255,255,.08);--txt:#f2f2f4;--mut:rgba(255,255,255,.55)}
+:root{--top:#17232f;--bot:#0f151c;--ac:#b9a7ff;--card:rgba(255,255,255,.08);--txt:#f2f2f4;--mut:rgba(255,255,255,.55)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-html,body{height:100%;overflow:hidden;color:var(--txt);font-family:system-ui,sans-serif;background:linear-gradient(180deg,var(--top),var(--bot))}
+html,body{height:100%;overflow:hidden;color:var(--txt);font-family:system-ui,sans-serif;background:linear-gradient(180deg,var(--top),var(--bot));-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+*{-webkit-tap-highlight-color:transparent}
 button{font:inherit;color:inherit;background:none;border:0}
 .i{width:24px;height:24px;fill:currentColor;flex:none}
 #app{height:100%;display:flex;flex-direction:column}
@@ -557,7 +559,7 @@ else if(filter&&filter.k==='folder')l=l.filter(s=>(s.path||'').startsWith(filter
   else if(tab==='fav')l=l.filter(s=>isFav(s.id));
   else if(tab==='rec')l=recent.map(i=>byId[i]).filter(Boolean);
   if(q)l=l.filter(s=>(s.title+' '+s.artist+' '+s.album).toLowerCase().includes(q));
-  l=l.filter(s=>!songHid.includes(s.id));
+  l=l.filter(s=>!songHid.includes(s.id)&&!artHid.includes(s.artist));
   return ((tab==='rec'&&!filter)||(filter&&filter.k==='pl'))?l:l.slice().sort(cmp);
 }
 function groups(k){
@@ -985,7 +987,7 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('#set')&&!e.target.closest('#moreBtn'))SET.classList.remove('open');
 });
 $('fab').onclick=()=>{
-  const l=(!filter&&(tab==='albums'||tab==='artists'))?songs:visible();
+  const l=(!filter&&(tab==='albums'||tab==='artists'))?songs.filter(okS):visible();
   if(!l.length)return;
   startQueue(l,l[Math.floor(Math.random()*l.length)].id,true);
 };
@@ -994,7 +996,7 @@ $('fab').onclick=()=>{
 const OPT0={rows:0,fab:1,one:0,min:0,hap:1};
 let opt=Object.assign({},OPT0);try{Object.assign(opt,JSON.parse(localStorage.opt||'{}'))}catch(e){}
 const saveOpt=()=>{try{localStorage.opt=JSON.stringify(opt)}catch(e){}};
-const okS=s=>(!opt.min||s.dur>=opt.min*1000)&&!songHid.includes(s.id);
+const okS=s=>(!opt.min||s.dur>=opt.min*1000)&&!songHid.includes(s.id)&&!artHid.includes(s.artist);
 function applyOpt(){
   document.body.classList.toggle('compact',!!opt.rows);
   document.body.classList.toggle('nofab',!opt.fab);
@@ -1335,7 +1337,7 @@ document.addEventListener('visibilitychange',()=>{
 
 async function toggle(){
   if(st.id>0)apply(await Music.toggle());
-  else if(shown)startQueue(songs,shown);
+  else if(shown)startQueue(songs.filter(s=>okS(s)||s.id===shown),shown);
 }
 ['pp','mpp'].forEach(i=>$(i).onclick=toggle);
 ['next','mnext'].forEach(i=>$(i).onclick=async()=>apply(await Music.next()));
@@ -1420,7 +1422,7 @@ window.addEventListener('resize',drawWave);
 })();
 $('mOpen').onclick=openFull;$('mArt').onclick=openFull;$('close').onclick=closeFull;
 function openQ(){
-  $('ql').innerHTML=queue.map(id=>{const s=byId[id];return s?row(id,s.title,s.artist,false,'data-q="'+id+'"',id===shown):''}).join('');
+  $('ql').innerHTML=queue.map(id=>{const s=byId[id];return s&&(okS(s)||id===shown)?row(id,s.title,s.artist,false,'data-q="'+id+'"',id===shown):''}).join('');
   $('qs').classList.add('open');
   const c=$('ql').querySelector('.on');if(c)c.scrollIntoView({block:'center'});
 }
@@ -1464,6 +1466,7 @@ byId[s.id]=s;
     try{localStorage.songsCache=JSON.stringify(songs)}catch(e){}
       const l=+localStorage.last;
   if(l&&byId[l]&&!shown)showTrack(l,false);
+  else if(!shown){const f0=visible()[0];if(f0)showTrack(f0.id,false)}
   apply(await Music.getState());
   dropAnim();
 }catch(e){

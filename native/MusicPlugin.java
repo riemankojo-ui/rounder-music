@@ -649,9 +649,9 @@ public void writeTags(PluginCall call) {
             org.jaudiotagger.tag.Tag tag = f.getTag();
             if (tag == null) { tag = f.createDefaultTag(); f.setTag(tag); }
 
-            if (title != null) tag.setField(org.jaudiotagger.tag.FieldKey.TITLE, title);
-            if (artist != null) tag.setField(org.jaudiotagger.tag.FieldKey.ARTIST, artist);
-            if (album != null) tag.setField(org.jaudiotagger.tag.FieldKey.ALBUM, album);
+            if (title != null) { if (title.isEmpty()) tag.deleteField(org.jaudiotagger.tag.FieldKey.TITLE); else tag.setField(org.jaudiotagger.tag.FieldKey.TITLE, title); }
+            if (artist != null) { if (artist.isEmpty()) tag.deleteField(org.jaudiotagger.tag.FieldKey.ARTIST); else tag.setField(org.jaudiotagger.tag.FieldKey.ARTIST, artist); }
+            if (album != null) { if (album.isEmpty()) tag.deleteField(org.jaudiotagger.tag.FieldKey.ALBUM); else tag.setField(org.jaudiotagger.tag.FieldKey.ALBUM, album); }
 
             if (coverBase64 != null && !coverBase64.isEmpty()) {
                 byte[] imgData = Base64.decode(coverBase64, Base64.DEFAULT);
@@ -664,6 +664,8 @@ public void writeTags(PluginCall call) {
             }
 
             org.jaudiotagger.audio.AudioFileIO.write(f);
+            android.media.MediaScannerConnection.scanFile(getContext(), new String[]{path}, null, null);
+            new java.io.File(getContext().getCacheDir(), "art_" + id + "_160.jpg").delete();
             
             // Clear cache so the app loads the new image immediately
             java.io.File cf = new java.io.File(getContext().getCacheDir(), "art_" + id + "_600.jpg");

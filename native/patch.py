@@ -28,7 +28,7 @@ if 'READ_MEDIA_AUDIO' not in s:
 
 st = 'android/app/src/main/res/values/styles.xml'
 if os.path.exists(st):
-    t = open(st).read().replace('@drawable/splash', '#FF121212')
+    t = open(st).read().replace('@drawable/splash', '#FF17232F')
     open(st, 'w').write(t)
 # Add jaudiotagger for editing physical files
 bg = 'android/app/build.gradle'
